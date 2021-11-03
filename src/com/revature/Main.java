@@ -2,6 +2,8 @@ package com.revature;
 
 import com.revature.model.User;
 import com.revature.service.UserService;
+
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Main {
@@ -28,14 +30,27 @@ public class Main {
                     tempUser = userService.login();
                     if (tempUser != null) {
                         currentUser = tempUser;
-                        System.out.println("Whew!");
+                        System.out.println("You are now Logged In.");
                     }
+                    /*
+                     - Check balances
+                     - Withdraw amount
+                     - Deposit amount
+                     - Transfer between accounts
+                     - Sign out
+                     */
+                    // LinkedList<String> ll = new LinkedList<String>();
                     break;
                 }
                 case "0":
+                    System.out.println("Closing Program");
                     System.exit(0);
                     break;
             }
         }
+    }
+
+    public static void LoggedInPage(){
+
     }
 }
