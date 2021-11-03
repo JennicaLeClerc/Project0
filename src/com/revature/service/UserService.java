@@ -1,10 +1,7 @@
 package com.revature.service;
 
 import com.revature.model.User;
-
 import java.util.*;
-
-// Bold: "\033[1mTEXT\033[0m"
 
 public class UserService {
     Scanner scanner;
@@ -208,7 +205,7 @@ public class UserService {
                     ViewBalance(user);
                     break;
                 } else {
-                    user.setSavings_balance(user.getSavings_balance() - amount)
+                    user.setSavings_balance(user.getSavings_balance() - amount);
                     ViewBalance(user, account);
                 }
                 break;
@@ -237,6 +234,36 @@ public class UserService {
                 break;
         }
         ViewBalance( user,account );
+    }
+
+    /**
+     * Transferring Amount from chosen Account Type (Checking or Savings)
+     * to other account. Checks if the balance during Withdraw changes.
+     * Since if it doesn't change then the Amount either was 0 or too much to
+     * Withdraw. If it passes this test, then it Deposits those funds to the
+     * Chosen Account.
+     */
+    public void TransferFrom( User user, String account, double amount ){
+        double tempamount = 0;
+        switch ( account ){
+            case "Checking":
+                tempamount = user.getChecking_balance();
+                Withdraw(user, "Checking", amount);
+                if( tempamount != user.getChecking_balance() ){
+                    Deposit(user, "Savings", amount);
+                }
+                break;
+            case "Savings":
+                tempamount = user.getSavings_balance();
+                Withdraw(user, "Savings", amount);
+                if( tempamount != user.getSavings_balance() ){
+                    Deposit(user, "Checking", amount);
+                }
+                break;
+            default:
+                menuService.invalidAccountPrint();
+                break;
+        }
     }
 
     /**
