@@ -7,32 +7,45 @@ import java.util.*;
 // Bold: "\033[1mTEXT\033[0m"
 
 public class UserService {
+    Scanner scanner;
+    MenuService menuService;
+
+    public UserService(Scanner scanner, MenuService menuService){
+        this.scanner = scanner;
+        this.menuService = menuService;
+    }
+
     List<String> usernameList = new ArrayList<>();
     List<User> userpinList = new ArrayList<>();
 
-    Scanner scanner = new Scanner(System.in);
-
     private static int current_account_num = 1110; // The number has to have these modifiers for the incrementation to work
 
-    public void createUser(){ // purpose create user?
+    /**
+     * Creates a user with First Name, Last Name, Username, Pincode, Account No.
+     * Checking Balance, Savings Balance.
+     */
+    public void createUser(){
         int account_number = Account_Number();
         String[] names = Name();
-        String[] credentials = usernameAndPasswordCreater();
+        String[] credentials = UsernameAndPinCreater();
+        double[] balances = InitialBalances();
 
         userpinList.add( new User(credentials[0], credentials[1])) ;
-        User newuser = new User(account_number, credentials[0], credentials[1], names[0], names[1]);
-        newuser.setChecking_balance(0);
-        newuser.setSavings_balance(0);
-        System.out.println("You have created an account.");
+        User newuser = new User(account_number, credentials[0],
+                credentials[1], names[0], names[1], balances[0], balances[1]);
+        menuService.accountCreatedPrint();
     }
 
-    // Logs in user
-    public User login(){
-        // Has you input your username and pincode
-        String[] credentials = usernameAndPasswordInput();
+    /**
+     * Log in user has you input your username and pincode.
+     * For each user in the userlist, checks if the username exists and
+     * if it does, checks to see if the pincode is correct for that user.
+     * If the username and password is correct it returns the user.
+     * If not it returns that it is invalid.
+    */
+     public User Login(){
+        String[] credentials = UsernameAndPinInput();
 
-        // For each user in the userlist, checks if the username exists and if it does,
-        // checks to see if the pincode is correct for that user.
         for(User user: userpinList){
             String tempUsername = user.getUsername(); // explicit assignment
             if(tempUsername.equals(credentials[0])){
@@ -41,24 +54,25 @@ public class UserService {
                 }
             }
         }
-        // If the username or pincode is incorrect it returns this:
-        System.out.println("\033[1mInvalid Username or Pincode\033[0m");
+        menuService.notValidUsernamePin();
         return null;
     }
 
-    // Asking for a non-empty First and Last Name
+    /**
+     * Asking for a non-empty First and Last Name from user then returns them.
+     */
     public String[] Name(){
         String fname;
         String lname;
         Scanner scanner = new Scanner(System.in); // Creating Scanner Object
         do{
-            System.out.println("Enter First Name: ");
+            menuService.enterFirstNamePrompt();
             fname = scanner.nextLine();
         }
         while( fname == null || fname.length() <= 1 );
 
         do{
-            System.out.println("Enter Last Name: ");
+            menuService.enterLastNamePrompt();
             lname = scanner.nextLine(); // nextLine is for Strings
         }
         while( lname == null || lname.length() <= 1 );
@@ -66,163 +80,191 @@ public class UserService {
         return new String[]{fname, lname};
     }
 
-    // Setting the account Number
+    /**
+     * Gives the new user the next Account Number then returns the Account Number.
+     */
     public int Account_Number(){
-        // Gives the next account number
         current_account_num++;
-        System.out.println("Account Number: " + current_account_num + "\n");
+        menuService.printAccountNumber(current_account_num);
         return current_account_num;
     }
 
-    // Creates a username and pincode string
-    public String[] usernameAndPasswordCreater(){
+    /**
+     * Creates a Username and Pincode string
+     */
+    public String[] UsernameAndPinCreater(){
         String username = UserName();
         String pincode = PinCode();
         scanner.nextLine();
         return new String[]{username, pincode};
     }
 
-    // Asks for username and pincode for loggin purposes
-    public String[] usernameAndPasswordInput(){
-        //scanner.nextLine(); // Fixes: Doesn't let you input the username the first time. No longer a problem with the order of inputs
-        System.out.println("Please enter your username: ");
+    /**
+     * Asks for Username and Pincode for login purposes.
+     * Returns string of Username and Pincode
+     */
+    public String[] UsernameAndPinInput(){
+        menuService.enterUsernamePrompt();
         String username = scanner.nextLine();
 
-        System.out.println("\nPlease enter your 4 digit pincode: ");
-        //String pincode = scanner.nextLine();
+        menuService.enterPinPrompt();
         String pincode = String.valueOf(scanner.nextInt());
         return new String[]{username, pincode};
     }
 
-    // Has you create a username
-    // - length: more than 5 characters and less than 10 characters
+    /**
+     * Has the user create a Username where the length has to be between 5
+     * and 10 characters. Returns the Username.
+     */
     public String UserName(){
-        boolean isnewuser = true;
-        System.out.println("\nUser Name must be at least 5 characters and no more than 10.");
+        boolean isnewuser;
         String username;
-
+        menuService.usernameLengthPrint();
         do{
             do{
-                System.out.println("Enter User Name: ");
+                menuService.enterUsernamePrompt();
                 username = scanner.nextLine();
                 isnewuser = GoodUserName( username );
             }
             while( username == null || username.length() > 10 || username.length() < 5);
         }
         while( !isnewuser );
-
         usernameList.add(username);
-
-        //System.out.println("");
         return username;
     }
 
-    // Checks if username
+    /**
+     * Checks if the chosen Username is already in use. Returns true if
+     * unique Username. Returns false if Username is already in use.
+     */
     public boolean GoodUserName( String username ){
         boolean isgood = true;
         for( String i : usernameList){
-            if( i.equals( username ) ){ // Use .equals() for strings
-                System.out.println("\033[1mUsername in use. Please try again.\033[0m");
+            if( i.equals( username ) ){
+                menuService.invalidUsername();
                 isgood = false;
             }
         }
         return isgood;
     }
 
-    //Create a pincode
-    // - length: 4 digit pin
+    /**
+     * Has the user create a 4 Digit Pin. Catches if they do not enter 4 Digits.
+     * Returns a String of the Pin.
+     */
     public String PinCode(){
-        String pincode;
-        int pin = 0;
-        int numberOfDigits = 0;
+        int pin;
+        int numberOfDigits;
+        menuService.pinLengthPrint();
         do{
-            System.out.println("Select 4 digit pin: ");
+            menuService.enterPinPrompt();
             try{
-                pin = scanner.nextInt(); // nextInt is for integers
+                pin = scanner.nextInt();
             }
             catch ( InputMismatchException e ){
-                System.out.println("You did not enter a number. Please try again.");
+                menuService.invalidType();
                 pin = 0;
-                scanner.nextLine(); // Fixed: without this the do loop was infinite without letting me input a new pin.
+                scanner.nextLine();
             }
             numberOfDigits = String.valueOf(pin).length();
         }
         while( numberOfDigits != 4 );
-
-        pincode = String.valueOf(pin);
-
-        System.out.println("");
-        return pincode;
+        return String.valueOf(pin);
     }
 
-    // Withdraw and Deposite
-    /*public void Deposit( String account, double amount ){
-        System.out.println("Depositing funds to " + account );
-        switch ( account ){
-            case "Checking":
-                this.checking_balance += amount;
-                break;
-            case "Savings":
-                this.savings_balance += amount;
-                break;
-            default:
-                System.out.println("\033[1mACCOUNT DOES NOT EXIST\033[0m");
-                break;
-        }
-        this.Print_Balance( account );
+    /**
+     * Makes sure that the initial balance for Checking and Savings is 0.
+     * Prints out Balances. Returns the balances.
+     */
+    public double[] InitialBalances(){
+        double checking = 0;
+        double savings = 0;
+        menuService.printBalances( checking, savings );
+        return new double[]{checking, savings};
     }
 
-    public void Withdraw( String account, double amount ){
-        System.out.println("Withdrawing funds from " + account);
-        switch ( account ){
+    /**
+     * Checks if you have enough money in the Account Type (Checking or Savings)
+     * you selected for the Amount you want. If you don't have enough funds in
+     * that account, you are shown your balances. If you do have enough fund,
+     * that Amount is Withdrawn from the selected Account Type.
+     */
+    public void Withdraw( User user, String account, double amount ) {
+        menuService.printWithdrawAcc(account);
+        switch (account) {
             case "Checking":
-                if( this.checking_balance < amount ){
-                    System.out.println("          \033[1mNOT ENOUGH FUNDS\033[0m");
-                    this.Print_Balance("All");
+                if (user.getChecking_balance() < amount) {
+                    menuService.invalidFunds();
+                    ViewBalance(user);
                     break;
-                }
-                else{
-                    this.checking_balance -= amount;
-                    this.Print_Balance(account);
+                } else {
+                    user.setChecking_balance(user.getChecking_balance() - amount);
+                    ViewBalance(user, account);
                 }
                 break;
             case "Savings":
-                if( this.savings_balance < amount ){
-                    System.out.println("          \033[1mNOT ENOUGH FUNDS\033[0m");
-                    this.Print_Balance("All");
+                if (user.getSavings_balance() < amount) {
+                    menuService.invalidFunds();
+                    ViewBalance(user);
                     break;
-                }
-                else{
-                    this.savings_balance -= amount;
-                    this.Print_Balance(account);
+                } else {
+                    user.setSavings_balance(user.getSavings_balance() - amount)
+                    ViewBalance(user, account);
                 }
                 break;
             default:
-                System.out.println("\033[1mACCOUNT DOES NOT EXIST\033[0m");
-                this.Print_Balance("All");
+                menuService.invalidAccountPrint();
+                ViewBalance(user);
                 break;
         }
     }
 
-    public void Print_Balance(){
-        System.out.println("   Checking account balance: $" + String.format("%.2f", this.checking_balance));
-        System.out.println("   Savings account balance:  $" + String.format("%.2f", this.savings_balance) + "\n");
-    }
-
-    public void Print_Balance( String account ){
-        switch (account){
+    /**
+     * Adds the amount you want to Deposit to your desired Account Type
+     * (Checking or Savings). Then prints out your current balance
+     */
+    public void Deposit( User user, String account, double amount){
+        menuService.printDepositAcc( account );
+        switch ( account ){
             case "Checking":
-                System.out.println("   Checking account balance: $" + String.format("%.2f", this.checking_balance) + "\n");
+                user.setChecking_balance(user.getChecking_balance() + amount);
                 break;
             case "Savings":
-                System.out.println("   Savings account balance: $" + String.format("%.2f", this.savings_balance) + "\n");
+                user.setSavings_balance(user.getSavings_balance() + amount);
+                break;
+            default:
+                menuService.invalidAccountPrint();
+                break;
+        }
+        ViewBalance( user,account );
+    }
+
+    /**
+     * Takes in a User and an Account Type (Checking or Savings or All) and prints out
+     * the blanance(s) for those chosen. Tells you the Account Doesn't Exist if invalid
+     * account given.
+     */
+    public void ViewBalance( User user, String account ) {
+        switch( account ) {
+            case "Checking":
+                menuService.printCheckingBalance(user.getChecking_balance());
+                break;
+            case "Savings":
+                menuService.printSavingsBalance(user.getSavings_balance());
                 break;
             case "All":
-                this.Print_Balance();
+                ViewBalance( user );
                 break;
             default:
-                System.out.println("\033[1mACCOUNT DOES NOT EXIST\033[0m \n");
+                menuService.invalidAccountPrint();
                 break;
         }
-    }*/
+    }
+
+    /**
+     * Takes in a User and prints out the balances for both Checking and Savings
+     */
+    public void ViewBalance( User user ){
+        menuService.printBalances( user.getChecking_balance(), user.getSavings_balance() );
+    }
 }

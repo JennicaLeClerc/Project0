@@ -1,24 +1,33 @@
 package com.revature;
 
 import com.revature.model.User;
+import com.revature.service.MenuService;
 import com.revature.service.UserService;
 
 import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Main {
+
+    User currentUser;
+    UserService userService;
+    MenuService menuService;
+    Scanner scanner;
+
+    public Main(){
+        this.menuService = new MenuService();
+        this.scanner = new Scanner(System.in);
+        this.userService = new UserService(this.scanner, this.menuService);
+    }
+
     public static void main(String[] args) {
-        // write your code here
-        User currentUser;
-        UserService userService = new UserService();
-        Scanner scanner = new Scanner(System.in);
+        Main driver = new Main();
+        driver.mainMenu();
+    }
 
-
+    public void mainMenu(){
         while (true) {
-            System.out.println("Option 1: create");
-            System.out.println("Option 2: login");
-            System.out.println("Option 0: exit");
-
+            menuService.mainMenuPrompt();
             String choice = scanner.nextLine();
 
             switch (choice) {
@@ -27,7 +36,7 @@ public class Main {
                     break;
                 case "2": {
                     User tempUser;
-                    tempUser = userService.login();
+                    tempUser = userService.Login();
                     if (tempUser != null) {
                         currentUser = tempUser;
                         System.out.println("You are now Logged In.");
@@ -46,11 +55,11 @@ public class Main {
                     System.out.println("Closing Program");
                     System.exit(0);
                     break;
+                default:
+                    menuService.incorrectMenuSelection();
+                    menuService.mainMenuOptions();
             }
         }
     }
 
-    public static void LoggedInPage(){
-
-    }
 }
