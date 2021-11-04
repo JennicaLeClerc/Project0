@@ -26,6 +26,8 @@ public class Main {
     }
 
     public void mainMenu(){
+        Main driver = new Main();
+
         while (true) {
             menuService.mainMenuPrompt();
             String choice = scanner.nextLine();
@@ -39,26 +41,99 @@ public class Main {
                     tempUser = userService.Login();
                     if (tempUser != null) {
                         currentUser = tempUser;
-                        System.out.println("You are now Logged In.");
+                        menuService.loginText();
+                        driver.LogInMenu(tempUser);
                     }
-                    /*
-                     - Check balances
-                     - Withdraw amount
-                     - Deposit amount
-                     - Transfer between accounts
-                     - Sign out
-                     */
                     // LinkedList<String> ll = new LinkedList<String>();
+
+                    // If you're back here after all the menus you
+                    // must have logged out.
+                    tempUser = null;
                     break;
                 }
                 case "0":
-                    System.out.println("Closing Program");
+                    menuService.textClosing();
                     System.exit(0);
                     break;
                 default:
                     menuService.incorrectMenuSelection();
                     menuService.mainMenuOptions();
             }
+        }
+    }
+
+    public void LogInMenu( User user ){
+        Main driver = new Main();
+
+        while (true){
+            menuService.logInMenuPrompt();
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    driver.CheckBalanceMenu(user);
+                    break;
+                case "2":
+                    driver.WithdrawMenu(user);
+                    break;
+                case "3":
+                    break;
+                case "4":
+                    break;
+                case "0":
+                    return;
+                default:
+                    menuService.incorrectMenuSelection();
+                    menuService.mainMenuOptions();
+            }
+            return;
+        }
+    }
+
+    public void CheckBalanceMenu( User user ){
+        while(true){
+            menuService.checkBalanceMenuPrompt();
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    userService.ViewBalance(user);
+                    break;
+                case "2":
+                    userService.ViewBalance(user, "Checking");
+                    break;
+                case "3":
+                    userService.ViewBalance(user, "Savings");
+                    break;
+                case "0":
+                    return;
+                default:
+                    menuService.incorrectMenuSelection();
+                    menuService.mainMenuOptions();
+            }
+            return;
+        }
+    }
+
+    public void WithdrawMenu( User user ){
+        while(true){
+            menuService.withdrawMenuPrompt();
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    userService.Withdraw(user, "Checking");
+                    break;
+                case "2":
+                    userService.Withdraw(user, "Savings");
+                    break;
+                case "0":
+                    return;
+                default:
+                    menuService.incorrectMenuSelection();
+                    menuService.mainMenuOptions();
+            }
+            return;
         }
     }
 

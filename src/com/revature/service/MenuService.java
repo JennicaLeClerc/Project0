@@ -16,6 +16,43 @@ public class MenuService {
         System.out.println("0) Exit the Application");
     }
 
+    public void logInMenuPrompt(){
+        System.out.println("\n--- Log In Menu ---");
+        logInMenuOptions();
+    }
+
+    public void logInMenuOptions(){
+        System.out.println("1) Check Balances");
+        System.out.println("2) Withdraw Money");
+        System.out.println("3) Desoposit Money");
+        System.out.println("4) Transfer Money");
+        System.out.println("0) Sign Out");
+    }
+
+    public void checkBalanceMenuPrompt(){
+        System.out.println("\n--- Check Balance ---");
+        checkBalanceMenuOptions();
+    }
+
+    public void checkBalanceMenuOptions(){
+        System.out.println("1) All Balances");
+        System.out.println("2) Checking Balance");
+        System.out.println("3) Savings Balance");
+        System.out.println("0) Back");
+    }
+
+    public void withdrawMenuPrompt(){
+        System.out.println("\n--- Withdraw Balance ---");
+        withdrawMenuOptions();
+    }
+
+    public void withdrawMenuOptions(){
+        System.out.println("Withdraw From:");
+        System.out.println("    1) Checking");
+        System.out.println("    2) Savings");
+        System.out.println("    0) Back");
+    }
+
     /**
      * Print Statements with inputs
      */
@@ -74,6 +111,11 @@ public class MenuService {
         System.out.println("Enter Last Name: ");
     }
 
+    public void enterAmountWithdrawPrompt(){
+        System.out.println("Amount must me in increments of $20");
+        System.out.println("Withdraw Amount: ");
+    }
+
     /**
      *      One Line Printed Statements
      */
@@ -89,7 +131,7 @@ public class MenuService {
 
     // Lets the user know their account was created
     public void accountCreatedPrint(){
-        System.out.println("You have created an account.");
+        System.out.println("\nYou have created an account.\n");
     }
 
     // Lets the user know the length restrictions of the Username
@@ -109,7 +151,7 @@ public class MenuService {
 
     // Lets the user know that they don't have enough money to withdraw from the account they chose
     public void invalidFunds(){
-        System.out.println("          \033[1mNOT ENOUGH FUNDS\033[0m");
+        System.out.println("          \033[1mINSUFFICIENT FUNDS\033[0m");
     }
 
     // Lets the user know that the Username they chose is already in user
@@ -120,5 +162,15 @@ public class MenuService {
     // Lets the user know that they did not enter the requested 4 Digits. And to try again
     public void invalidType(){
         System.out.println("You did not enter a number. Please try again.");
+    }
+
+    // Text letting you know that you are logged in.
+    public void loginText(){
+        System.out.println("You are now Logged In.");
+    }
+
+    // Text letting you know that the program is closing.
+    public void textClosing(){
+        System.out.println("Closing Program");
     }
 }

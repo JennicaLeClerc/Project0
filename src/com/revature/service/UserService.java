@@ -22,9 +22,9 @@ public class UserService {
      * Checking Balance, Savings Balance.
      */
     public void createUser(){
-        int account_number = Account_Number();
         String[] names = Name();
         String[] credentials = UsernameAndPinCreater();
+        int account_number = Account_Number();
         double[] balances = InitialBalances();
 
         userpinList.add( new User(credentials[0], credentials[1])) ;
@@ -214,6 +214,50 @@ public class UserService {
                 ViewBalance(user);
                 break;
         }
+    }
+
+    // Overloading (do the same with Deposite and Transfer
+    public void Withdraw( User user, String account) {
+        menuService.printWithdrawAcc(account);
+        double amount = AmountWithdraw();
+
+        switch (account) {
+            case "Checking":
+                if (user.getChecking_balance() < amount) {
+                    menuService.invalidFunds();
+                    ViewBalance(user);
+                    break;
+                } else {
+                    user.setChecking_balance(user.getChecking_balance() - amount);
+                    ViewBalance(user, account);
+                }
+                break;
+            case "Savings":
+                if (user.getSavings_balance() < amount) {
+                    menuService.invalidFunds();
+                    ViewBalance(user);
+                    break;
+                } else {
+                    user.setSavings_balance(user.getSavings_balance() - amount);
+                    ViewBalance(user, account);
+                }
+                break;
+            default:
+                menuService.invalidAccountPrint();
+                ViewBalance(user);
+                break;
+        }
+    }
+
+    public double AmountWithdraw(){
+        int amount;
+        do{
+            menuService.enterAmountWithdrawPrompt();
+            amount = scanner.nextInt();
+        }
+        while( amount != 0 & amount%20 != 0 );
+        double Amount = amount;
+        return Amount;
     }
 
     /**
